@@ -6,6 +6,8 @@
   <title>SpA Health Tracker</title>
   <!-- TAILWIND CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- CHART.JS CDN FOR DATA VISUALIZATION -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-slate-100 font-sans text-slate-800 min-h-screen p-4 md:p-8">
 
@@ -21,6 +23,35 @@
     <div id="status-banner" class="p-4 rounded-xl shadow-sm transition-all duration-300">
       <!-- Injected dynamically via JavaScript -->
     </div>
+
+    <!-- ROLLING 3-DAY MEDICATION SCHEDULER BANNER -->
+    <section class="bg-indigo-900 text-white p-5 rounded-xl shadow-md space-y-2">
+      <div class="flex justify-between items-center">
+        <h2 class="font-bold text-xs uppercase tracking-wider text-indigo-200">💊 3-Day Arcoxia Protocol (Score ≥ 7)</h2>
+        <span id="treatment-status-badge" class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+          No Severe Flare
+        </span>
+      </div>
+      
+      <p id="treatment-schedule-text" class="text-xs text-indigo-100 leading-relaxed">
+        No pain ≥ 7 reported. Arcoxia is only needed for severe pain.
+      </p>
+
+      <div id="treatment-days-container" class="grid grid-cols-3 gap-2 pt-1 hidden">
+        <div id="day-1-box" class="bg-indigo-800/60 p-2 rounded text-center border border-indigo-700">
+          <div class="text-[10px] text-indigo-300 font-medium">DAY 1</div>
+          <div id="day-1-date" class="text-xs font-bold mt-0.5">---</div>
+        </div>
+        <div id="day-2-box" class="bg-indigo-800/60 p-2 rounded text-center border border-indigo-700">
+          <div class="text-[10px] text-indigo-300 font-medium">DAY 2</div>
+          <div id="day-2-date" class="text-xs font-bold mt-0.5">---</div>
+        </div>
+        <div id="day-3-box" class="bg-indigo-800/60 p-2 rounded text-center border border-indigo-700">
+          <div class="text-[10px] text-indigo-300 font-medium">DAY 3</div>
+          <div id="day-3-date" class="text-xs font-bold mt-0.5">---</div>
+        </div>
+      </div>
+    </section>
 
     <!-- QUICK ACTIONS -->
     <section class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-3">
@@ -40,7 +71,7 @@
     <!-- SPOT PAIN INCIDENT LOG -->
     <section class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-3">
       <h2 class="font-semibold text-slate-800 text-sm tracking-wide uppercase">Log Pain Incident</h2>
-      <p class="text-xs text-slate-500">Record pain location, time, and trigger cause.</p>
+      <p class="text-xs text-slate-500">Record spot pain details and instant severity level.</p>
 
       <div class="grid grid-cols-2 gap-2">
         <div>
@@ -60,35 +91,40 @@
           <select id="pain-cause" class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
             <option value="Sat for long time">Sat for long time</option>
             <option value="Long walking">Long walking</option>
-            <option value="Heavy lifting">Heavy lifting</option>
+            <option value="Angkat berat (Heavy lifting)">Angkat berat (Heavy lifting)</option>
             <option value="Appeared by itself">Appeared by itself</option>
             <option value="Stairs / Dorm climb">Stairs / Dorm climb</option>
           </select>
         </div>
       </div>
 
-      <div>
-        <label class="block text-xs font-medium text-slate-600 mb-1">Time</label>
-        <input type="time" id="pain-time" class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Severity (1 - 10)</label>
+          <input type="number" id="incident-severity" min="1" max="10" value="7" class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Time</label>
+          <input type="time" id="pain-time" class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+        </div>
       </div>
 
       <button onclick="logPainIncident()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-3 rounded-lg shadow transition duration-150 text-xs">
         + Add Pain Incident
       </button>
 
-      <!-- Today's Pain Count Badge -->
       <div class="pt-2 text-xs text-slate-500 flex justify-between items-center border-t border-slate-100">
         <span>Today's Pain Episodes:</span>
         <span id="today-pain-count" class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded-full font-bold text-xs">0 times</span>
       </div>
     </section>
 
-    <!-- DAILY FLARE & STIFFNESS LOG -->
+    <!-- DAILY FLARE SUMMARY -->
     <section class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-4">
       <h2 class="font-semibold text-slate-800 text-sm tracking-wide uppercase">Daily Summary</h2>
       
       <div>
-        <label class="block text-xs font-medium text-slate-600 mb-1">Overall Pain Severity (1 - 10)</label>
+        <label class="block text-xs font-medium text-slate-600 mb-1">Overall Daily Pain Severity (1 - 10)</label>
         <input type="number" id="pain-level" min="1" max="10" value="5" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
       </div>
 
@@ -106,6 +142,25 @@
       <button onclick="logSymptom()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 px-4 rounded-lg shadow transition duration-150 text-sm">
         Save Daily Summary
       </button>
+    </section>
+
+    <!-- DATA VISUALIZATION CHARTS CARD -->
+    <section class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-6">
+      <h2 class="font-semibold text-slate-800 text-sm tracking-wide uppercase">📊 Analytics Dashboard</h2>
+
+      <!-- Trend Chart -->
+      <div>
+        <h3 class="text-xs font-bold text-slate-600 mb-2">Pain vs. Stiffness Trend</h3>
+        <canvas id="trendChart" class="w-full h-48"></canvas>
+      </div>
+
+      <!-- Trigger Breakdown Chart -->
+      <div class="border-t border-slate-100 pt-4">
+        <h3 class="text-xs font-bold text-slate-600 mb-2">Pain Triggers Breakdown</h3>
+        <div class="max-w-[220px] mx-auto">
+          <canvas id="triggerChart"></canvas>
+        </div>
+      </div>
     </section>
 
     <!-- HISTORY LOG CARD -->
@@ -128,9 +183,7 @@
         ⚠️
       </div>
       <h3 class="font-bold text-slate-900 text-lg">Hold On!</h3>
-      <p id="modal-msg" class="text-xs text-slate-600 leading-relaxed">
-        <!-- Message updated via JS -->
-      </p>
+      <p id="modal-msg" class="text-xs text-slate-600 leading-relaxed"></p>
       <div class="space-y-2 pt-2">
         <button onclick="closeModal()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-medium py-2.5 rounded-lg text-xs shadow">
           I'll Wait (Cancel)
@@ -144,6 +197,8 @@
 
   <script>
     const WAIT_GAP_HOURS = 2;
+    let trendChartInstance = null;
+    let triggerChartInstance = null;
 
     document.addEventListener("DOMContentLoaded", () => {
       const now = new Date();
@@ -151,15 +206,15 @@
       
       checkTimingWindows();
       updateTodayPainCount();
+      update3DayTreatmentProtocol();
       renderLogs();
+      renderCharts();
       setInterval(checkTimingWindows, 60000);
     });
 
-    // TOGGLE NO STIFFNESS
     function toggleStiffnessInput() {
       const checkbox = document.getElementById("no-stiffness");
       const stiffnessInput = document.getElementById("stiffness-mins");
-      
       if (checkbox.checked) {
         stiffnessInput.value = 0;
         stiffnessInput.disabled = true;
@@ -171,66 +226,132 @@
       }
     }
 
-    // LOG PAIN INCIDENT WITH CAUSE
+    // LOG PAIN INCIDENT & RESET 3-DAY PROTOCOL IF SEVERITY >= 7
     function logPainIncident() {
       const location = document.getElementById("pain-location").value;
       const cause = document.getElementById("pain-cause").value;
+      const severity = parseInt(document.getElementById("incident-severity").value) || 5;
       const time = document.getElementById("pain-time").value;
-      const today = new Date().toLocaleDateString();
+      const todayDateObj = new Date();
+      const today = todayDateObj.toLocaleDateString();
 
-      const incident = {
-        date: today,
-        time: time,
-        location: location,
-        cause: cause
+      const incident = { 
+        date: today, 
+        timestamp: todayDateObj.getTime(),
+        time, 
+        location, 
+        cause,
+        severity
       };
 
       let incidents = JSON.parse(localStorage.getItem("spaIncidents")) || [];
       incidents.push(incident);
       localStorage.setItem("spaIncidents", JSON.stringify(incidents));
 
+      // ONLY TRIGGER 3-DAY WINDOW IF PAIN IS 7 OR ABOVE
+      if (severity >= 7) {
+        localStorage.setItem("lastPainStartDate", todayDateObj.toISOString());
+      }
+
       updateTodayPainCount();
+      update3DayTreatmentProtocol();
       renderLogs();
+      renderCharts();
+    }
+
+    function logSymptom() {
+      const pain = parseInt(document.getElementById("pain-level").value) || 5;
+      const noStiffness = document.getElementById("no-stiffness").checked;
+      const stiffness = noStiffness ? 0 : document.getElementById("stiffness-mins").value;
+      const todayDateObj = new Date();
+
+      let logs = JSON.parse(localStorage.getItem("spaLogs")) || [];
+      logs.push({ date: todayDateObj.toLocaleDateString(), pain, stiffness });
+      localStorage.setItem("spaLogs", JSON.stringify(logs));
+
+      // ALSO TRIGGER 3-DAY PROTOCOL IF DAILY SUMMARY PAIN IS 7 OR ABOVE
+      if (pain >= 7) {
+        localStorage.setItem("lastPainStartDate", todayDateObj.toISOString());
+      }
+
+      update3DayTreatmentProtocol();
+      renderLogs();
+      renderCharts();
+    }
+
+    // CALCULATE 3-DAY MEDICATION WINDOW (ONLY FOR PAIN >= 7)
+    function update3DayTreatmentProtocol() {
+      const lastPainIso = localStorage.getItem("lastPainStartDate");
+      const badge = document.getElementById("treatment-status-badge");
+      const text = document.getElementById("treatment-schedule-text");
+      const container = document.getElementById("treatment-days-container");
+
+      if (!lastPainIso) {
+        badge.innerText = "No Severe Flare";
+        badge.className = "px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+        text.innerText = "No pain score ≥ 7 recorded. Arcoxia is not required today.";
+        container.classList.add("hidden");
+        return;
+      }
+
+      const startDate = new Date(lastPainIso);
+      const d1 = new Date(startDate);
+      const d2 = new Date(startDate); d2.setDate(d2.getDate() + 1);
+      const d3 = new Date(startDate); d3.setDate(d3.getDate() + 2);
+
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      d3.setHours(23,59,59,999);
+
+      const isTreatmentActive = today <= d3;
+
+      if (isTreatmentActive) {
+        badge.innerText = "3-Day Course Active";
+        badge.className = "px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30 animate-pulse";
+        
+        const options = { weekday: 'short', month: 'numeric', day: 'numeric' };
+        document.getElementById("day-1-date").innerText = d1.toLocaleDateString('en-US', options);
+        document.getElementById("day-2-date").innerText = d2.toLocaleDateString('en-US', options);
+        document.getElementById("day-3-date").innerText = d3.toLocaleDateString('en-US', options);
+        
+        text.innerHTML = `Severe pain (≥7) recorded on <b>${d1.toLocaleDateString('en-US', {weekday: 'short'})}</b>. Take Arcoxia daily through <b>${d3.toLocaleDateString('en-US', {weekday: 'short'})}</b>.`;
+        container.classList.remove("hidden");
+      } else {
+        badge.innerText = "Course Completed";
+        badge.className = "px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+        text.innerText = "3-day treatment completed. Arcoxia paused unless severe pain (≥7) recurs.";
+        container.classList.add("hidden");
+      }
     }
 
     function updateTodayPainCount() {
       const today = new Date().toLocaleDateString();
       let incidents = JSON.parse(localStorage.getItem("spaIncidents")) || [];
       const todayCount = incidents.filter(i => i.date === today).length;
-      
       document.getElementById("today-pain-count").innerText = `${todayCount} times`;
     }
 
-    // LOG COFFEE
     function logCoffee() {
-      const now = new Date().getTime();
-      localStorage.setItem("lastCoffeeTime", now);
+      localStorage.setItem("lastCoffeeTime", new Date().getTime());
       checkTimingWindows();
     }
 
-    // CHECK BEFORE LOGGING MEDICATION
     function attemptLogMedication() {
       const lastCoffee = parseInt(localStorage.getItem("lastCoffeeTime")) || null;
-      const now = new Date().getTime();
-
       if (lastCoffee) {
-        const hoursSinceCoffee = (now - lastCoffee) / (1000 * 60 * 60);
+        const hoursSinceCoffee = (new Date().getTime() - lastCoffee) / (1000 * 60 * 60);
         if (hoursSinceCoffee < WAIT_GAP_HOURS) {
           const minsLeft = Math.ceil((WAIT_GAP_HOURS - hoursSinceCoffee) * 60);
-          
-          document.getElementById("modal-msg").innerHTML = 
-            `You drank coffee/tea recently. To prevent <b>stomach irritation</b>, please wait <b>${minsLeft} more minutes</b> before taking Arcoxia.`;
+          document.getElementById("modal-msg").innerHTML = `You drank coffee recently. Please wait <b>${minsLeft} mins</b> before taking Arcoxia.`;
           document.getElementById("warning-modal").classList.remove("hidden");
           return;
         }
       }
-
       forceLogMedication();
     }
 
     function forceLogMedication() {
-      const now = new Date().getTime();
-      localStorage.setItem("lastMedTime", now);
+      localStorage.setItem("lastMedTime", new Date().getTime());
       closeModal();
       checkTimingWindows();
     }
@@ -239,28 +360,21 @@
       document.getElementById("warning-modal").classList.add("hidden");
     }
 
-    // TWO-WAY TIMING CALCULATOR
     function checkTimingWindows() {
       const lastCoffee = parseInt(localStorage.getItem("lastCoffeeTime")) || null;
       const lastMed = parseInt(localStorage.getItem("lastMedTime")) || null;
       const statusBanner = document.getElementById("status-banner");
       const now = new Date().getTime();
 
-      let coffeeWaitMins = 0;
-      let medWaitMins = 0;
+      let coffeeWaitMins = 0, medWaitMins = 0;
 
       if (lastCoffee) {
-        const hoursSinceCoffee = (now - lastCoffee) / (1000 * 60 * 60);
-        if (hoursSinceCoffee < WAIT_GAP_HOURS) {
-          medWaitMins = Math.ceil((WAIT_GAP_HOURS - hoursSinceCoffee) * 60);
-        }
+        const h = (now - lastCoffee) / 3600000;
+        if (h < WAIT_GAP_HOURS) medWaitMins = Math.ceil((WAIT_GAP_HOURS - h) * 60);
       }
-
       if (lastMed) {
-        const hoursSinceMed = (now - lastMed) / (1000 * 60 * 60);
-        if (hoursSinceMed < WAIT_GAP_HOURS) {
-          coffeeWaitMins = Math.ceil((WAIT_GAP_HOURS - hoursSinceMed) * 60);
-        }
+        const h = (now - lastMed) / 3600000;
+        if (h < WAIT_GAP_HOURS) coffeeWaitMins = Math.ceil((WAIT_GAP_HOURS - h) * 60);
       }
 
       if (medWaitMins > 0) {
@@ -268,34 +382,14 @@
         statusBanner.innerHTML = `<span>⚠️</span> <b>Coffee Logged:</b> Wait <b>${medWaitMins} mins</b> before taking Arcoxia.`;
         return;
       }
-
       if (coffeeWaitMins > 0) {
         statusBanner.className = "p-4 rounded-xl shadow-sm bg-rose-50 border border-rose-200 text-rose-900 text-sm font-medium";
-        statusBanner.innerHTML = `<span>🔴</span> <b>Medication Logged:</b> Wait <b>${coffeeWaitMins} mins</b> before drinking coffee or tea.`;
+        statusBanner.innerHTML = `<span>🔴</span> <b>Medication Logged:</b> Wait <b>${coffeeWaitMins} mins</b> before drinking coffee.`;
         return;
       }
 
       statusBanner.className = "p-4 rounded-xl shadow-sm bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-medium";
       statusBanner.innerHTML = "<span>🟢</span> <b>Safe Window Open:</b> Safe to drink coffee/tea or take medication.";
-    }
-
-    // DAILY SYMPTOM LOGGING
-    function logSymptom() {
-      const pain = document.getElementById("pain-level").value;
-      const noStiffness = document.getElementById("no-stiffness").checked;
-      const stiffness = noStiffness ? 0 : document.getElementById("stiffness-mins").value;
-
-      const newEntry = {
-        date: new Date().toLocaleDateString(),
-        pain: pain,
-        stiffness: stiffness
-      };
-
-      let logs = JSON.parse(localStorage.getItem("spaLogs")) || [];
-      logs.push(newEntry);
-      localStorage.setItem("spaLogs", JSON.stringify(logs));
-
-      renderLogs();
     }
 
     function renderLogs() {
@@ -324,11 +418,11 @@
           ? (latestLog.stiffness == 0 ? "<span class='text-emerald-600 font-medium'>No Stiffness</span>" : `${latestLog.stiffness} mins stiff`) 
           : "No summary logged";
 
-        let painScoreText = latestLog ? `Pain: ${latestLog.pain}/10` : "No score";
+        let painScoreText = latestLog ? `Daily Pain: ${latestLog.pain}/10` : "No summary score";
 
         let incidentDetails = dayIncidents.map(i => 
           `<div class="mt-1 bg-slate-50 border border-slate-100 rounded p-1.5 flex justify-between items-center text-[11px]">
-            <span><b>${i.time}</b> - 📍 ${i.location}</span>
+            <span><b>${i.time}</b> - 📍 ${i.location} (Sev: ${i.severity || 'N/A'})</span>
             <span class="text-rose-600 italic">⚡ ${i.cause || 'Not specified'}</span>
           </div>`
         ).join("");
@@ -349,7 +443,74 @@
       });
     }
 
-    // EXPORT DATA
+    function renderCharts() {
+      let logs = JSON.parse(localStorage.getItem("spaLogs")) || [];
+      let incidents = JSON.parse(localStorage.getItem("spaIncidents")) || [];
+
+      const labels = logs.map(l => l.date);
+      const painData = logs.map(l => l.pain);
+      const stiffnessData = logs.map(l => l.stiffness);
+
+      if (trendChartInstance) trendChartInstance.destroy();
+
+      const ctxTrend = document.getElementById("trendChart").getContext("2d");
+      trendChartInstance = new Chart(ctxTrend, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Pain Level (1-10)',
+              data: painData,
+              borderColor: '#e11d48',
+              backgroundColor: 'rgba(225, 29, 72, 0.1)',
+              yAxisID: 'yPain',
+              tension: 0.3
+            },
+            {
+              label: 'Stiffness (mins)',
+              data: stiffnessData,
+              borderColor: '#6366f1',
+              backgroundColor: 'rgba(99, 102, 241, 0.1)',
+              yAxisID: 'yStiffness',
+              tension: 0.3
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            yPain: { type: 'linear', position: 'left', min: 0, max: 10, title: { display: true, text: 'Pain Score' } },
+            yStiffness: { type: 'linear', position: 'right', min: 0, title: { display: true, text: 'Mins' }, grid: { drawOnChartArea: false } }
+          }
+        }
+      });
+
+      const causesCount = {};
+      incidents.forEach(i => {
+        const c = i.cause || "Unspecified";
+        causesCount[c] = (causesCount[c] || 0) + 1;
+      });
+
+      if (triggerChartInstance) triggerChartInstance.destroy();
+
+      const ctxTrigger = document.getElementById("triggerChart").getContext("2d");
+      triggerChartInstance = new Chart(ctxTrigger, {
+        type: 'doughnut',
+        data: {
+          labels: Object.keys(causesCount),
+          datasets: [{
+            data: Object.values(causesCount),
+            backgroundColor: ['#f59e0b', '#ef4444', '#8b5cf6', '#10b981', '#3b82f6']
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } }
+        }
+      });
+    }
+
     function exportData() {
       const logs = localStorage.getItem("spaLogs");
       const incidents = localStorage.getItem("spaIncidents");
