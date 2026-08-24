@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SpA Health Tracker</title>
+  <title>SpA Health & Coffee Tracker</title>
   <!-- TAILWIND CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- CHART.JS CDN FOR DATA VISUALIZATION -->
@@ -15,7 +15,7 @@
 
     <!-- HEADER -->
     <header class="text-center">
-      <h1 class="text-2xl font-bold text-slate-900">SpA Health Tracker</h1>
+      <h1 class="text-2xl font-bold text-slate-900">SpA Health & Coffee Log</h1>
       <p class="text-xs text-slate-500 mt-1">Manage timing windows, flares, and pain locations</p>
     </header>
 
@@ -27,7 +27,7 @@
     <!-- ROLLING 3-DAY MEDICATION SCHEDULER BANNER -->
     <section class="bg-indigo-900 text-white p-5 rounded-xl shadow-md space-y-2">
       <div class="flex justify-between items-center">
-        <h2 class="font-bold text-xs uppercase tracking-wider text-indigo-200">💊 3-Day Arcoxia Protocol (Score ≥ 7)</h2>
+        <h2 class="font-bold text-xs uppercase tracking-wider text-indigo-200">💊 3-Day Arcoxia Protocol (Severity ≥ 7)</h2>
         <span id="treatment-status-badge" class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
           No Severe Flare
         </span>
@@ -55,7 +55,7 @@
 
     <!-- QUICK ACTIONS -->
     <section class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-3">
-      <h2 class="font-semibold text-slate-800 text-sm tracking-wide uppercase">Quick Actions</h2>
+      <h2 class="font-semibold text-slate-800 text-sm tracking-wide uppercase">1. Quick Actions</h2>
       
       <div class="grid grid-cols-2 gap-3">
         <button onclick="logCoffee()" class="bg-amber-600 hover:bg-amber-700 text-white font-medium py-3 px-3 rounded-lg shadow transition duration-150 text-xs flex flex-col items-center gap-1">
@@ -70,7 +70,7 @@
 
     <!-- SPOT PAIN INCIDENT LOG -->
     <section class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-3">
-      <h2 class="font-semibold text-slate-800 text-sm tracking-wide uppercase">Log Pain Incident</h2>
+      <h2 class="font-semibold text-slate-800 text-sm tracking-wide uppercase">2. Log Pain Incident</h2>
       <p class="text-xs text-slate-500">Record spot pain details and instant severity level.</p>
 
       <div class="grid grid-cols-2 gap-2">
@@ -119,18 +119,13 @@
       </div>
     </section>
 
-    <!-- DAILY FLARE SUMMARY -->
+    <!-- MORNING STIFFNESS LOG -->
     <section class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-4">
-      <h2 class="font-semibold text-slate-800 text-sm tracking-wide uppercase">Daily Summary</h2>
+      <h2 class="font-semibold text-slate-800 text-sm tracking-wide uppercase">3. Morning Stiffness Log</h2>
       
       <div>
-        <label class="block text-xs font-medium text-slate-600 mb-1">Overall Daily Pain Severity (1 - 10)</label>
-        <input type="number" id="pain-level" min="1" max="10" value="5" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-      </div>
-
-      <div>
         <div class="flex items-center justify-between mb-1">
-          <label class="text-xs font-medium text-slate-600">Morning Stiffness (Mins)</label>
+          <label class="text-xs font-medium text-slate-600">Stiffness Duration (Minutes)</label>
           <label class="inline-flex items-center cursor-pointer text-xs text-indigo-600">
             <input type="checkbox" id="no-stiffness" onchange="toggleStiffnessInput()" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 mr-1">
             No stiffness today
@@ -139,19 +134,19 @@
         <input type="number" id="stiffness-mins" value="30" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
       </div>
 
-      <button onclick="logSymptom()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 px-4 rounded-lg shadow transition duration-150 text-sm">
-        Save Daily Summary
+      <button onclick="logStiffness()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 px-4 rounded-lg shadow transition duration-150 text-sm">
+        Save Morning Stiffness
       </button>
     </section>
 
-    <!-- DATA VISUALIZATION CHARTS CARD -->
+    <!-- DATA VISUALIZATION CHARTS CARD (UPDATED TO PAIN FREQUENCY) -->
     <section class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-6">
       <h2 class="font-semibold text-slate-800 text-sm tracking-wide uppercase">📊 Analytics Dashboard</h2>
 
-      <!-- Trend Chart -->
+      <!-- Weekly Pain Frequency Chart -->
       <div>
-        <h3 class="text-xs font-bold text-slate-600 mb-2">Pain vs. Stiffness Trend</h3>
-        <canvas id="trendChart" class="w-full h-48"></canvas>
+        <h3 class="text-xs font-bold text-slate-600 mb-2">Pain Frequency Throughout the Week (Episodes per Day)</h3>
+        <canvas id="frequencyChart" class="w-full h-48"></canvas>
       </div>
 
       <!-- Trigger Breakdown Chart -->
@@ -166,15 +161,19 @@
     <!-- HISTORY LOG CARD -->
     <section class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
       <div class="flex items-center justify-between mb-3">
-        <h2 class="font-semibold text-slate-800 text-sm tracking-wide uppercase">Log History</h2>
-        <button onclick="exportData()" class="text-xs text-indigo-600 hover:underline">Export JSON</button>
-      </div>
-      <ul id="log-history" class="space-y-3 text-xs text-slate-600 divide-y divide-slate-100">
-        <!-- Injected via JavaScript -->
+  <h2 class="font-semibold text-slate-800 text-sm tracking-wide uppercase">Log History</h2>
+  <div class="space-x-2 text-xs">
+    <button onclick="exportData()" class="text-indigo-600 hover:underline">Export</button>
+    <label class="text-indigo-600 hover:underline cursor-pointer">
+      Import
+      <input type="file" id="import-file" accept=".json" onchange="importData(event)" class="hidden">
+    </label>
+  </div>
+</div>
+      <ul id="log-history" class="space-y-2 text-slate-700 text-[11px]">
+        <!-- Log entries will be dynamically injected here -->
       </ul>
     </section>
-
-  </div>
 
   <!-- WARNING MODAL POPUP -->
   <div id="warning-modal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
@@ -197,7 +196,7 @@
 
   <script>
     const WAIT_GAP_HOURS = 2;
-    let trendChartInstance = null;
+    let frequencyChartInstance = null;
     let triggerChartInstance = null;
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -226,7 +225,6 @@
       }
     }
 
-    // LOG PAIN INCIDENT & RESET 3-DAY PROTOCOL IF SEVERITY >= 7
     function logPainIncident() {
       const location = document.getElementById("pain-location").value;
       const cause = document.getElementById("pain-cause").value;
@@ -248,7 +246,6 @@
       incidents.push(incident);
       localStorage.setItem("spaIncidents", JSON.stringify(incidents));
 
-      // ONLY TRIGGER 3-DAY WINDOW IF PAIN IS 7 OR ABOVE
       if (severity >= 7) {
         localStorage.setItem("lastPainStartDate", todayDateObj.toISOString());
       }
@@ -259,27 +256,19 @@
       renderCharts();
     }
 
-    function logSymptom() {
-      const pain = parseInt(document.getElementById("pain-level").value) || 5;
+    function logStiffness() {
       const noStiffness = document.getElementById("no-stiffness").checked;
-      const stiffness = noStiffness ? 0 : document.getElementById("stiffness-mins").value;
-      const todayDateObj = new Date();
+      const stiffness = noStiffness ? 0 : (parseInt(document.getElementById("stiffness-mins").value) || 0);
+      const today = new Date().toLocaleDateString();
 
       let logs = JSON.parse(localStorage.getItem("spaLogs")) || [];
-      logs.push({ date: todayDateObj.toLocaleDateString(), pain, stiffness });
+      logs = logs.filter(l => l.date !== today);
+      logs.push({ date: today, stiffness });
       localStorage.setItem("spaLogs", JSON.stringify(logs));
 
-      // ALSO TRIGGER 3-DAY PROTOCOL IF DAILY SUMMARY PAIN IS 7 OR ABOVE
-      if (pain >= 7) {
-        localStorage.setItem("lastPainStartDate", todayDateObj.toISOString());
-      }
-
-      update3DayTreatmentProtocol();
       renderLogs();
-      renderCharts();
     }
 
-    // CALCULATE 3-DAY MEDICATION WINDOW (ONLY FOR PAIN >= 7)
     function update3DayTreatmentProtocol() {
       const lastPainIso = localStorage.getItem("lastPainStartDate");
       const badge = document.getElementById("treatment-status-badge");
@@ -289,7 +278,7 @@
       if (!lastPainIso) {
         badge.innerText = "No Severe Flare";
         badge.className = "px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
-        text.innerText = "No pain score ≥ 7 recorded. Arcoxia is not required today.";
+        text.innerText = "No pain severity ≥ 7 recorded. Arcoxia is not required today.";
         container.classList.add("hidden");
         return;
       }
@@ -415,10 +404,8 @@
         li.className = "pt-3 space-y-1";
 
         let stiffnessText = latestLog 
-          ? (latestLog.stiffness == 0 ? "<span class='text-emerald-600 font-medium'>No Stiffness</span>" : `${latestLog.stiffness} mins stiff`) 
-          : "No summary logged";
-
-        let painScoreText = latestLog ? `Daily Pain: ${latestLog.pain}/10` : "No summary score";
+          ? (latestLog.stiffness == 0 ? "<span class='text-emerald-600 font-medium'>No Stiffness</span>" : `Stiffness: ${latestLog.stiffness} mins`) 
+          : "Stiffness not logged";
 
         let incidentDetails = dayIncidents.map(i => 
           `<div class="mt-1 bg-slate-50 border border-slate-100 rounded p-1.5 flex justify-between items-center text-[11px]">
@@ -432,9 +419,8 @@
             <span>${date}</span>
             <span class="bg-rose-100 text-rose-700 text-[10px] px-2 py-0.5 rounded-full">${dayIncidents.length} pain episode(s)</span>
           </div>
-          <div class="flex justify-between text-slate-500">
-            <span>${painScoreText}</span>
-            <span>${stiffnessText}</span>
+          <div class="text-slate-500 text-[11px]">
+            <span>🌅 ${stiffnessText}</span>
           </div>
           <div class="space-y-1 mt-1">${incidentDetails}</div>
         `;
@@ -444,44 +430,49 @@
     }
 
     function renderCharts() {
-      let logs = JSON.parse(localStorage.getItem("spaLogs")) || [];
       let incidents = JSON.parse(localStorage.getItem("spaIncidents")) || [];
 
-      const labels = logs.map(l => l.date);
-      const painData = logs.map(l => l.pain);
-      const stiffnessData = logs.map(l => l.stiffness);
+      // Get the last 7 unique dates from incidents, or generate recent daily labels if empty
+      let dates = [...new Set(incidents.map(i => i.date))].slice(-7);
+      if (dates.length === 0) {
+        // Default sample labels if no data yet
+        dates = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+      }
 
-      if (trendChartInstance) trendChartInstance.destroy();
+      const frequencyData = dates.map(d => {
+        // If dates are specific date strings like "8/24/2026", count incidents matching that date
+        return incidents.filter(i => i.date === d).length;
+      });
 
-      const ctxTrend = document.getElementById("trendChart").getContext("2d");
-      trendChartInstance = new Chart(ctxTrend, {
-        type: 'line',
+      if (frequencyChartInstance) frequencyChartInstance.destroy();
+
+      const ctxFreq = document.getElementById("frequencyChart").getContext("2d");
+      frequencyChartInstance = new Chart(ctxFreq, {
+        type: 'bar',
         data: {
-          labels: labels,
+          labels: dates,
           datasets: [
             {
-              label: 'Pain Level (1-10)',
-              data: painData,
+              label: 'Pain Episodes Count',
+              data: frequencyData,
+              backgroundColor: 'rgba(225, 29, 72, 0.7)',
               borderColor: '#e11d48',
-              backgroundColor: 'rgba(225, 29, 72, 0.1)',
-              yAxisID: 'yPain',
-              tension: 0.3
-            },
-            {
-              label: 'Stiffness (mins)',
-              data: stiffnessData,
-              borderColor: '#6366f1',
-              backgroundColor: 'rgba(99, 102, 241, 0.1)',
-              yAxisID: 'yStiffness',
-              tension: 0.3
+              borderWidth: 1,
+              borderRadius: 6
             }
           ]
         },
         options: {
           responsive: true,
           scales: {
-            yPain: { type: 'linear', position: 'left', min: 0, max: 10, title: { display: true, text: 'Pain Score' } },
-            yStiffness: { type: 'linear', position: 'right', min: 0, title: { display: true, text: 'Mins' }, grid: { drawOnChartArea: false } }
+            y: { 
+              beginAtZero: true,
+              ticks: { stepSize: 1 },
+              title: { display: true, text: 'Number of Episodes' }
+            }
+          },
+          plugins: {
+            legend: { display: false }
           }
         }
       });
@@ -517,7 +508,7 @@
       if (!logs && !incidents) return alert("No data to export!");
 
       const exportObj = {
-        dailySummaries: JSON.parse(logs || "[]"),
+        stiffnessLogs: JSON.parse(logs || "[]"),
         painIncidents: JSON.parse(incidents || "[]")
       };
 
