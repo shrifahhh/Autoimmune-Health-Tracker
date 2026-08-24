@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SpA Health Tracker</title>
+  <title>SpA Health & Coffee Tracker</title>
   <!-- TAILWIND CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -13,8 +13,8 @@
 
     <!-- HEADER -->
     <header class="text-center">
-      <h1 class="text-2xl font-bold text-slate-900">SpA Health Tracker</h1>
-      <p class="text-xs text-slate-500 mt-1">Your personal daily health companion</p>
+      <h1 class="text-2xl font-bold text-slate-900">SpA Health & Coffee Log</h1>
+      <p class="text-xs text-slate-500 mt-1">Manage timing windows, flares, and pain locations</p>
     </header>
 
     <!-- STATUS BANNER -->
@@ -22,9 +22,9 @@
       <!-- Injected dynamically via JavaScript -->
     </div>
 
-    <!-- QUICK LOG ACTIONS -->
+    <!-- QUICK ACTIONS -->
     <section class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-3">
-      <h2 class="font-semibold text-slate-800 text-sm tracking-wide uppercase">1. Log Actions</h2>
+      <h2 class="font-semibold text-slate-800 text-sm tracking-wide uppercase">Quick Actions</h2>
       
       <div class="grid grid-cols-2 gap-3">
         <button onclick="logCoffee()" class="bg-amber-600 hover:bg-amber-700 text-white font-medium py-3 px-3 rounded-lg shadow transition duration-150 text-xs flex flex-col items-center gap-1">
@@ -37,22 +37,74 @@
       </div>
     </section>
 
-    <!-- SYMPTOM LOG CARD -->
+    <!-- SPOT PAIN INCIDENT LOG -->
+    <section class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-3">
+      <h2 class="font-semibold text-slate-800 text-sm tracking-wide uppercase">Log Pain Incident</h2>
+      <p class="text-xs text-slate-500">Record pain location, time, and trigger cause.</p>
+
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Location</label>
+          <select id="pain-location" class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+            <option value="Lower Back / SI Joints">Lower Back / SI Joints</option>
+            <option value="Mid-Back / Spine">Mid-Back / Spine</option>
+            <option value="Neck / Shoulders">Neck / Shoulders</option>
+            <option value="Hips / Buttocks">Hips / Buttocks</option>
+            <option value="Full Upper Body">Full Upper Body</option>
+            <option value="Other Joint">Other Joint</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Trigger / Cause</label>
+          <select id="pain-cause" class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+            <option value="Sat for long time">Sat for long time</option>
+            <option value="Long walking">Long walking</option>
+            <option value="Heavy lifting">Heavy lifting</option>
+            <option value="Appeared by itself">Appeared by itself</option>
+            <option value="Stairs / Dorm climb">Stairs / Dorm climb</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-medium text-slate-600 mb-1">Time</label>
+        <input type="time" id="pain-time" class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+      </div>
+
+      <button onclick="logPainIncident()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-3 rounded-lg shadow transition duration-150 text-xs">
+        + Add Pain Incident
+      </button>
+
+      <!-- Today's Pain Count Badge -->
+      <div class="pt-2 text-xs text-slate-500 flex justify-between items-center border-t border-slate-100">
+        <span>Today's Pain Episodes:</span>
+        <span id="today-pain-count" class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded-full font-bold text-xs">0 times</span>
+      </div>
+    </section>
+
+    <!-- DAILY FLARE & STIFFNESS LOG -->
     <section class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-4">
-      <h2 class="font-semibold text-slate-800 text-sm tracking-wide uppercase">2. Daily Flare Entry</h2>
+      <h2 class="font-semibold text-slate-800 text-sm tracking-wide uppercase">Daily Summary</h2>
       
       <div>
-        <label class="block text-xs font-medium text-slate-600 mb-1">Pain Severity (1 - 10)</label>
+        <label class="block text-xs font-medium text-slate-600 mb-1">Overall Pain Severity (1 - 10)</label>
         <input type="number" id="pain-level" min="1" max="10" value="5" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
       </div>
 
       <div>
-        <label class="block text-xs font-medium text-slate-600 mb-1">Morning Stiffness (Minutes)</label>
+        <div class="flex items-center justify-between mb-1">
+          <label class="text-xs font-medium text-slate-600">Morning Stiffness (Mins)</label>
+          <label class="inline-flex items-center cursor-pointer text-xs text-indigo-600">
+            <input type="checkbox" id="no-stiffness" onchange="toggleStiffnessInput()" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 mr-1">
+            No stiffness today
+          </label>
+        </div>
         <input type="number" id="stiffness-mins" value="30" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
       </div>
 
       <button onclick="logSymptom()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 px-4 rounded-lg shadow transition duration-150 text-sm">
-        Save Daily Log
+        Save Daily Summary
       </button>
     </section>
 
@@ -62,7 +114,7 @@
         <h2 class="font-semibold text-slate-800 text-sm tracking-wide uppercase">Log History</h2>
         <button onclick="exportData()" class="text-xs text-indigo-600 hover:underline">Export JSON</button>
       </div>
-      <ul id="log-history" class="space-y-2 text-xs text-slate-600 divide-y divide-slate-100">
+      <ul id="log-history" class="space-y-3 text-xs text-slate-600 divide-y divide-slate-100">
         <!-- Injected via JavaScript -->
       </ul>
     </section>
@@ -91,13 +143,63 @@
   </div>
 
   <script>
-    const WAIT_GAP_HOURS = 2; // Recommended gap between coffee and Arcoxia/Iron
+    const WAIT_GAP_HOURS = 2;
 
     document.addEventListener("DOMContentLoaded", () => {
+      const now = new Date();
+      document.getElementById("pain-time").value = now.toTimeString().substring(0, 5);
+      
       checkTimingWindows();
+      updateTodayPainCount();
       renderLogs();
       setInterval(checkTimingWindows, 60000);
     });
+
+    // TOGGLE NO STIFFNESS
+    function toggleStiffnessInput() {
+      const checkbox = document.getElementById("no-stiffness");
+      const stiffnessInput = document.getElementById("stiffness-mins");
+      
+      if (checkbox.checked) {
+        stiffnessInput.value = 0;
+        stiffnessInput.disabled = true;
+        stiffnessInput.classList.add("bg-slate-100", "text-slate-400");
+      } else {
+        stiffnessInput.disabled = false;
+        stiffnessInput.classList.remove("bg-slate-100", "text-slate-400");
+        stiffnessInput.value = 30;
+      }
+    }
+
+    // LOG PAIN INCIDENT WITH CAUSE
+    function logPainIncident() {
+      const location = document.getElementById("pain-location").value;
+      const cause = document.getElementById("pain-cause").value;
+      const time = document.getElementById("pain-time").value;
+      const today = new Date().toLocaleDateString();
+
+      const incident = {
+        date: today,
+        time: time,
+        location: location,
+        cause: cause
+      };
+
+      let incidents = JSON.parse(localStorage.getItem("spaIncidents")) || [];
+      incidents.push(incident);
+      localStorage.setItem("spaIncidents", JSON.stringify(incidents));
+
+      updateTodayPainCount();
+      renderLogs();
+    }
+
+    function updateTodayPainCount() {
+      const today = new Date().toLocaleDateString();
+      let incidents = JSON.parse(localStorage.getItem("spaIncidents")) || [];
+      const todayCount = incidents.filter(i => i.date === today).length;
+      
+      document.getElementById("today-pain-count").innerText = `${todayCount} times`;
+    }
 
     // LOG COFFEE
     function logCoffee() {
@@ -116,15 +218,13 @@
         if (hoursSinceCoffee < WAIT_GAP_HOURS) {
           const minsLeft = Math.ceil((WAIT_GAP_HOURS - hoursSinceCoffee) * 60);
           
-          // SHOW WARNING MODAL
           document.getElementById("modal-msg").innerHTML = 
-            `You drank coffee/tea recently. To prevent <b>stomach irritation</b> and stomach acid spikes, please wait <b>${minsLeft} more minutes</b> before taking Arcoxia.`;
+            `You drank coffee/tea recently. To prevent <b>stomach irritation</b>, please wait <b>${minsLeft} more minutes</b> before taking Arcoxia.`;
           document.getElementById("warning-modal").classList.remove("hidden");
           return;
         }
       }
 
-      // If safe, log directly
       forceLogMedication();
     }
 
@@ -165,7 +265,7 @@
 
       if (medWaitMins > 0) {
         statusBanner.className = "p-4 rounded-xl shadow-sm bg-amber-50 border border-amber-200 text-amber-900 text-sm font-medium";
-        statusBanner.innerHTML = `<span>⚠️</span> <b>Coffee Logged:</b> Wait <b>${medWaitMins} mins</b> before taking Arcoxia to avoid stomach distress.`;
+        statusBanner.innerHTML = `<span>⚠️</span> <b>Coffee Logged:</b> Wait <b>${medWaitMins} mins</b> before taking Arcoxia.`;
         return;
       }
 
@@ -179,14 +279,14 @@
       statusBanner.innerHTML = "<span>🟢</span> <b>Safe Window Open:</b> Safe to drink coffee/tea or take medication.";
     }
 
-    // SYMPTOM LOGGING
+    // DAILY SYMPTOM LOGGING
     function logSymptom() {
       const pain = document.getElementById("pain-level").value;
-      const stiffness = document.getElementById("stiffness-mins").value;
+      const noStiffness = document.getElementById("no-stiffness").checked;
+      const stiffness = noStiffness ? 0 : document.getElementById("stiffness-mins").value;
 
       const newEntry = {
         date: new Date().toLocaleDateString(),
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         pain: pain,
         stiffness: stiffness
       };
@@ -203,15 +303,48 @@
       logList.innerHTML = "";
       
       let logs = JSON.parse(localStorage.getItem("spaLogs")) || [];
-      if (logs.length === 0) {
+      let incidents = JSON.parse(localStorage.getItem("spaIncidents")) || [];
+
+      if (logs.length === 0 && incidents.length === 0) {
         logList.innerHTML = `<li class="pt-2 text-slate-400 italic">No entries saved yet.</li>`;
         return;
       }
 
-      logs.slice().reverse().forEach(entry => {
+      let allDates = [...new Set([...logs.map(l => l.date), ...incidents.map(i => i.date)])].reverse();
+
+      allDates.forEach(date => {
+        let dayLogs = logs.filter(l => l.date === date);
+        let dayIncidents = incidents.filter(i => i.date === date);
+        let latestLog = dayLogs[dayLogs.length - 1];
+
         let li = document.createElement("li");
-        li.className = "pt-2 flex justify-between items-center";
-        li.innerHTML = `<span><b>${entry.date}</b> (${entry.time}) - Pain: ${entry.pain}/10</span> <span class="bg-slate-100 px-2 py-1 rounded text-slate-500">${entry.stiffness} mins stiff</span>`;
+        li.className = "pt-3 space-y-1";
+
+        let stiffnessText = latestLog 
+          ? (latestLog.stiffness == 0 ? "<span class='text-emerald-600 font-medium'>No Stiffness</span>" : `${latestLog.stiffness} mins stiff`) 
+          : "No summary logged";
+
+        let painScoreText = latestLog ? `Pain: ${latestLog.pain}/10` : "No score";
+
+        let incidentDetails = dayIncidents.map(i => 
+          `<div class="mt-1 bg-slate-50 border border-slate-100 rounded p-1.5 flex justify-between items-center text-[11px]">
+            <span><b>${i.time}</b> - 📍 ${i.location}</span>
+            <span class="text-rose-600 italic">⚡ ${i.cause || 'Not specified'}</span>
+          </div>`
+        ).join("");
+
+        li.innerHTML = `
+          <div class="flex justify-between items-center font-bold text-slate-700">
+            <span>${date}</span>
+            <span class="bg-rose-100 text-rose-700 text-[10px] px-2 py-0.5 rounded-full">${dayIncidents.length} pain episode(s)</span>
+          </div>
+          <div class="flex justify-between text-slate-500">
+            <span>${painScoreText}</span>
+            <span>${stiffnessText}</span>
+          </div>
+          <div class="space-y-1 mt-1">${incidentDetails}</div>
+        `;
+
         logList.appendChild(li);
       });
     }
@@ -219,13 +352,19 @@
     // EXPORT DATA
     function exportData() {
       const logs = localStorage.getItem("spaLogs");
-      if (!logs) return alert("No data to export!");
+      const incidents = localStorage.getItem("spaIncidents");
+      if (!logs && !incidents) return alert("No data to export!");
 
-      const blob = new Blob([logs], { type: "application/json" });
+      const exportObj = {
+        dailySummaries: JSON.parse(logs || "[]"),
+        painIncidents: JSON.parse(incidents || "[]")
+      };
+
+      const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "spa_health_logs.json";
+      a.download = "spa_health_full_logs.json";
       a.click();
     }
   </script>
